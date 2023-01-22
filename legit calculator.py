@@ -4,7 +4,7 @@ try:
     A =a
     b = input("please enter operator(ex- +,-,^,*,%,/,!,sqrt):")
 
-    if b != ('!' and 'sqrt'):
+    if (b != '!') and (b != 'sqrt'):
         c = int(input("please enter second number : "))
         
 
