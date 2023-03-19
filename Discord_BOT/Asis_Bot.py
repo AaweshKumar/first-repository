@@ -17,7 +17,7 @@ async def send_message(message, user_message, is_private):   # Send messages
         await message.author.send(error_message) if is_private else await message.channel.send(error_message)
 
 def run_discord_bot():
-    TOKEN = 'MTA4NDc0OTYwMjY4ODg2MDIwMA.G9WNrZ.2lkrSV-mUSxDYBBOdlBbv0lTpkUakgo2mn0-hU' 
+    TOKEN = 'TOKEN' 
     intents = discord.Intents.default()
     client = discord.Client(intents=intents)
 
