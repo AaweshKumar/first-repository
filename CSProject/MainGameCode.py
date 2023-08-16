@@ -157,7 +157,8 @@ def add_question():
     next_question_number = last_question_number + 1
     qno_var.set(str(next_question_number))
 
-    qno_label = tk.Label(root, textvariable=qno_var)
+    qno_label_text = f"Question Number: {next_question_number}"
+    qno_label = tk.Label(root, text=qno_label_text)
     qno_label.pack()
 
     question_label = tk.Label(root, text="Question:")
