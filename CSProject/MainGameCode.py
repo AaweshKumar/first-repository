@@ -73,8 +73,26 @@ def add_new_user():
 
 # Function to add new question to the database
 def add_question():
+
     # Function to save data to the database
     def save_to_database():
+
+        try:
+            # ...
+
+            qno_str = qno_var.get().strip()
+            if not qno_str:
+                raise ValueError("Question number cannot be empty")
+    
+            q_no = int(qno_str)
+
+
+        except ValueError as ve:
+            messagebox.showerror("Error", f"Invalid input: {ve}")
+        except mysql.connector.Error as err:
+            messagebox.showerror("Error", f"An error occurred: {err}")
+
+
         try:
             # Establish a connection to the database
             db_connection = mysql.connector.connect(host="localhost", user="root", password="1234", database="CSproject")
@@ -93,8 +111,8 @@ def add_question():
             """
             db_cursor.execute(create_table_query)
 
+
             # Get user input
-            q_no = int(qno_var.get())
             question = question_text.get("1.0", tk.END).strip()
             answer = answer_text.get("1.0", tk.END).strip()
             question_type_input = question_type_text.get("1.0", tk.END).strip()  # Retrieve question type from text widget
@@ -116,19 +134,31 @@ def add_question():
             if db_connection:
                 db_connection.close()
 
-
+    
 
     # Create the GUI window
     root = tk.Tk()
     root.title("Question and Answer Entry")
+
+    def cancel():
+        root.destroy()  # Close the Add Question window
+
 
     # Create and place GUI widgets
     qno_label = tk.Label(root, text="Question Number:")
     qno_label.pack()
 
     qno_var = tk.StringVar()
-    qno_entry = tk.Entry(root, textvariable=qno_var)
-    qno_entry.pack()
+
+    # Display the automatically generated question number
+    last_question_query = "SELECT MAX(Q_no) FROM QuestionAnswer"
+    cursor.execute(last_question_query)
+    last_question_number = cursor.fetchone()[0]
+    next_question_number = last_question_number + 1
+    qno_var.set(str(next_question_number))
+
+    qno_label = tk.Label(root, textvariable=qno_var)
+    qno_label.pack()
 
     question_label = tk.Label(root, text="Question:")
     question_label.pack()
@@ -150,6 +180,11 @@ def add_question():
 
     save_button = tk.Button(root, text="Save", command=save_to_database)
     save_button.pack(padx=20, pady=10)
+
+    
+    cancel_button = tk.Button(root, text="Cancel/Close", command=cancel)
+    cancel_button.pack(padx=20, pady=10)
+
 
     root.mainloop()
 
@@ -189,7 +224,7 @@ def play_quiz():
         # Compare the user's answer with the correct answer
         similarity_ratio = difflib.SequenceMatcher(None, user_answer.lower(), correct_answer).ratio()
 
-        if similarity_ratio >= 0.85:  # Adjust this threshold as needed
+        if similarity_ratio >= 0.10:  
             result = "Correct"
         else:
             result = "Incorrect"
