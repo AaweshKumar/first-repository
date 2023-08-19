@@ -1,0 +1,126 @@
+Start -> authenticate_and_run_game()
+
+    -> Create authentication window (auth_window)
+    -> Display username_label
+    -> Display username_entry
+    -> Display password_label
+    -> Display password_entry
+    -> Display play_button
+    -> Display add_user_button
+
+    If play_button is clicked:
+        -> Get entered_username
+        -> Get entered_password
+        -> Connect to the database
+        -> Execute query to validate credentials
+        -> If credentials are valid:
+            -> Close auth_window
+            -> Call game_code(entered_username)
+        -> If credentials are invalid:
+            -> Show error message
+
+    If add_user_button is clicked:
+        -> Create user_window
+        -> Display username_label
+        -> Display username_entry
+        -> Display password_label
+        -> Display password_entry
+        -> Display save_button
+
+        If save_button is clicked:
+            -> Get new_username
+            -> Get new_password
+            -> If password length <= 8:
+                -> Save user data to UserTable
+                -> Show success message with user ID
+            -> If password length > 8:
+                -> Show error message
+
+game_code(username)
+
+    -> Connect to the MySQL database
+    -> Create main application window (app)
+    -> Display user_info_label (Username and Points)
+    -> Display add_button (Add New Question)
+    -> Display play_button (Play Quiz Game)
+    -> Display view_button (View Question Database)
+    -> Display add_user_button (Add New User)
+    -> Display cancel_button (Cancel/Close)
+    -> Display help_button (Help)
+
+    If add_button is clicked:
+        -> Call add_question()
+
+    If play_button is clicked:
+        -> Call play_quiz()
+
+    If view_button is clicked:
+        -> Call view_database()
+
+    If add_user_button is clicked:
+        -> Call add_new_user()
+
+    If cancel_button is clicked:
+        -> Close app
+
+    If help_button is clicked:
+        -> Call display_help()
+
+add_question()
+
+    -> Establish database connection
+    -> Get last_question_number
+    -> Calculate next_question_number
+    -> Display qno_label (Question Number)
+    -> Display question_label
+    -> Display question_text
+    -> Display answer_label
+    -> Display answer_text
+    -> Display question_type_label
+    -> Display question_type_text
+    -> Display save_button
+    -> Display cancel_button
+
+    If save_button is clicked:
+        -> Get question, answer, and question_type_input
+        -> Insert data into QuestionAnswer table
+        -> Show success message
+
+play_quiz()
+
+    -> Establish database connection
+    -> Fetch random question from database
+    -> Create quiz_window
+    -> Display question_label with random question
+    -> Display answer_entry
+    -> Display check_button
+    -> Display cancel_button
+
+    If cancel_button is clicked:
+        -> Close quiz_window
+
+    If check_button is clicked:
+        -> Get user_answer
+        -> Compare user_answer with correct_answer
+        -> If similarity_ratio is high:
+            -> Show "Correct" message
+            -> Update points in the database
+        -> If similarity_ratio is medium:
+            -> Show "Almost Correct" message
+        -> If similarity_ratio is low:
+            -> Show "Incorrect" message
+        -> Close quiz_window
+
+view_database()
+
+    -> Establish database connection
+    -> Fetch all rows from QuestionAnswer table
+    -> Create view_window
+    -> Display data in Treeview widget
+
+display_help()
+
+    -> Create help_window
+    -> Display help_text
+
+End
