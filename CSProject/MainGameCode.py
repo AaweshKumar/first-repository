@@ -81,6 +81,20 @@ def game_code(username):
     # Function to add new question to the database
     def add_question():
 
+        # Establish a connection to the database
+        db_connection = mysql.connector.connect(host="localhost", user="root", password="1234", database="CSproject")
+        cursor = db_connection.cursor()
+
+        qno_var = tk.StringVar()
+
+        # Display the automatically generated question number
+        last_question_query = "SELECT MAX(Q_no) FROM QuestionAnswer"
+        cursor.execute(last_question_query)
+        last_question_number = cursor.fetchone()[0]
+        next_question_number = last_question_number + 1
+        qno_var.set(str(next_question_number))
+
+
         # Function to save data to the database
         def save_to_database():
 
@@ -275,6 +289,10 @@ def game_code(username):
         cancel_button = tk.Button(quiz_window, text="Cancel", command=cancel)
         cancel_button.pack(padx=20, pady=10)
 
+            # Add a Help button
+        help_button = tk.Button(app, text="Help", command=display_help)
+        help_button.pack()
+
         # Function to check the answer
         def check_answer():
 
@@ -292,47 +310,54 @@ def game_code(username):
 
             try:
 
-                # Check if user's input is a number
-                if user_answer.isdigit():
-                    user_answer = int(user_answer)
-                    if user_answer == int(correct_answer):
-                        result = "Correct"
 
-                else:
+                if user_answer:
+
                     # Compare the user's lowercase answer with the correct answer
                     similarity_ratio = difflib.SequenceMatcher(None, correct_answer,user_answer.lower()).ratio()
                     print(similarity_ratio)
 
                 
-                    if similarity_ratio == 1.0:
+                    if (similarity_ratio == 1.0) or (similarity_ratio>=0.90):
                         result = "Correct"
+
+                        db_connection = mysql.connector.connect(host="localhost", user="root", password="1234", database="CSproject")
+                        db_cursor = db_connection.cursor()
+
 
                         # Execute the update query
                         update_points_query = "UPDATE UserTable SET Points = Points + 1 WHERE Username = %s"
                         db_cursor.execute(update_points_query, (current_username,))
                         db_connection.commit()
+   
+
+                        db_connection = mysql.connector.connect(host="localhost", user="root", password="1234", database="CSproject")
+                        cursor = db_connection.cursor() 
 
 
-                        # Check for spelling mistakes
-                        if similarity_ratio <= 0.85:
-                            messagebox.showinfo("Result", "Your answer was correct but there was a spelling error.")
+                        # Update points for the user in the database
+                        current_points_query = "SELECT Points FROM UserTable WHERE Username = %s"
+                        cursor.execute(current_points_query, (current_username,))
+                        current_points = cursor.fetchone()[0]
 
-                            db_connection = mysql.connector.connect(host="localhost", user="root", password="1234", database="CSproject")
+                        # Execute the update query
+                        update_points_query = "UPDATE UserTable SET Points = Points + 1 WHERE Username = %s"
+                        db_cursor.execute(update_points_query, current_username)
+                        db_connection.commit()
+
+                        # Update current points and user info label
+                        current_points += 1
+                        update_user_info(current_username, current_points)
+                        
+                    # Check for spelling mistakes
+                    elif (similarity_ratio < 0.90) or (similarity_ratio > 0.60):
+                        result = "Almost Correct :( "
+                        messagebox.showinfo("Result", "Your answer was correct but there was a spelling error or the anser was incomplete, No points will be given") 
+
+                    else :
+                        result = "Incorrect!"
 
 
-                            # Update points for the user in the database
-                            current_points_query = "SELECT Points FROM UserTable WHERE Username = %s"
-                            cursor.execute(current_points_query, (current_username,))
-                            current_points = cursor.fetchone()[0]
-
-                            # Execute the update query
-                            update_points_query = "UPDATE UserTable SET Points = Points + 1 WHERE Username = %s"
-                            db_cursor.execute(update_points_query, current_username)
-                            db_connection.commit()
-
-                            # Update current points and user info label
-                            current_points += 1
-                            update_user_info(current_username, current_points)
 
             except mysql.connector.Error as err:
                 messagebox.showerror("Error", f"An error occurred: {err}")
@@ -349,10 +374,38 @@ def game_code(username):
     # Create the main application window
     app = tk.Tk()
     app.title("Quiz Game")
-    app.geometry("610x450")
+    app.geometry("680x450")
     
     def cancel():
         app.destroy()
+
+
+    def display_help():
+        help_content = """
+        Welcome to the Quiz Game Help!
+    
+        This game allows users to play a quiz and manage questions.
+    
+        - To play the quiz, click the "Play Quiz Game" button and answer questions.
+            >The answers are not case sensitive.
+            >In numerical based questions, Don't forget to write the units!
+        - To add a new question, click the "Add New Question" button and enter details.
+            >If you want to add more than one ques, make sure to close and reopen the "add question" window after every successful attempt.
+        - To view the question database, click the "View Question Database" button.
+        - To add a new user, click the "Add New User" button and provide details.
+            >The password ust not exceed the lenght of 8 character(all special characters are allowed)
+            >The password is case sensitive!
+        - The Points displayed on the main menu will be updated only when the Game is closed.
+            >The updated points will be displayed the next time you open the game :)
+    
+        For any further assistance, please contact our support team.
+        """
+        help_window = tk.Toplevel()
+        help_window.title("Help")
+        help_text = tk.Label(help_window, text=help_content, padx=20, pady=20)
+        help_text.pack()
+
+    
 
     # Function to update and display user information
     def update_user_info(username, points):
@@ -389,12 +442,17 @@ def game_code(username):
     view_button = tk.Button(app, text="View Question Database", command=view_database)
     view_button.pack(side="left", padx=10, pady=10)
 
-    #Add new user button
+    #Add a user button
     add_user_button = tk.Button(app, text="Add New User", command=add_new_user)
     add_user_button.pack(side="left", padx=10, pady=10)
 
+    #Add a Cancel button
     cancel_button = tk.Button(app, text="Cancel/Close", command=cancel)
     cancel_button.pack(side="left", anchor="sw", padx=10, pady=(1, 10))
+
+    # Add a Help button
+    help_button = tk.Button(app, text="Help", command=display_help)
+    help_button.pack(side="left", anchor="se", padx=10, pady=(1, 10))
 
 
     # Run the GUI application
