@@ -124,3 +124,8 @@ display_help()
     -> Display help_text
 
 End
+
+command prompt installer for connector:
+pip install mysql-connector-python
+
+
