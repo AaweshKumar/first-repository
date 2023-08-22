@@ -1,3 +1,6 @@
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+QUESTION QUERIES:
+
 INSERT INTO questionanswer (Q_no, Question, Answer, Questiontype),
 VALUES(15, "What is the SI unit of electric current?", "ampere", "easy"),
     (16, "What type of energy does a moving car have?", "kinetic energy", "easy"),
@@ -49,3 +52,26 @@ VALUES(15, "What is the SI unit of electric current?", "ampere", "easy"),
     (63, "If a square has four sides, how many sides does a triangle have?", "3", "easy"),
     (64, "What is the opposite of \"happy\"?", "sad", "easy"),
     (65, "If all cats are mammals and some mammals have fur, can we conclude that some cats have fur?", "yes", "medium");
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATING THE USERTABLE:
+
+CREATE TABLE UserTable (
+    ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    Username VARCHAR(20) NOT NULL,
+    Password VARCHAR(8) NOT NULL,
+    Points INT DEFAULT 0);
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATING QUESTIONANSWER TABLE:
+
+CREATE TABLE IF NOT EXISTS QuestionAnswer 
+                    ( Q_no INT PRIMARY KEY,
+                    Question TEXT NOT NULL,
+                    Answer TEXT NOT NULL,
+                    QuestionType VARCHAR(20) DEFAULT NULL);
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
